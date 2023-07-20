@@ -26,7 +26,7 @@ modifiedGreg.numeric <- function(y,
                                  ...) {
 
 
-  .args <- as.list(environment())
+  .args <- c(as.list(environment()), list(...))
   do.call(validate_modifiedGreg, .args)
   funcCall <- match.call()
 
