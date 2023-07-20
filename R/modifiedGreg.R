@@ -1,12 +1,16 @@
-#' @export
-modifiedGreg <- function(x, ...)  UseMethod("modifiedGreg")
+#' @export modifiedGreg
+#' @import survey
+#' @import glmnet
+#' @import boot
+#' @importFrom stats model.matrix predict quasibinomial var aggregate as.formula
+modifiedGreg <- function(y, ...)  UseMethod("modifiedGreg")
 
 #' @export
 #' @rawNamespace export(modifiedGreg.numeric)
 modifiedGreg.numeric <- function(y,
                                  xsample,
                                  xpop,
-                                 condition,
+                                 domains,
                                  pi = NULL,
                                  pi2 = NULL,
                                  datatype = "raw",
@@ -18,7 +22,8 @@ modifiedGreg.numeric <- function(y,
                                  domain_col_name = NULL,
                                  estimation_conditions = NULL,
                                  N = NULL,
-                                 messages = T) {
+                                 messages = T,
+                                 ...) {
 
 
   .args <- as.list(environment())
@@ -53,7 +58,7 @@ modifiedGreg.numeric <- function(y,
   y <- as.vector(y)
 
   if (is.null(estimation_domains)) {
-    estimation_domains <- pop_unique_domains
+    estimation_domains <- unique(xpop[[domain_col_name]])
   }
 
   # creating a vector of common auxiliary variable names
@@ -149,7 +154,21 @@ modifiedGreg.numeric <- function(y,
     constant_component2 <- t(weight * xsample_d)
     betas <- solve(xsample_dt %*% diag(weight) %*% xsample_d) %*% (xsample_dt) %*% diag(weight) %*% y
 
-    res <- lapply(estimation_domains, FUN = by_domain_linear)
+    res <- lapply(estimation_domains,
+                  FUN = by_domain_linear,
+                  xsample,
+                  xpop_d,
+                  domain_col_name,
+                  constant_component1,
+                  constant_component2,
+                  betas,
+                  common_pred_vars,
+                  y,
+                  var_est,
+                  var_method,
+                  weight,
+                  pi,
+                  pi2)
 
   } else if (model == "logistic") {
 
@@ -171,8 +190,21 @@ modifiedGreg.numeric <- function(y,
     f <- paste(names(dat)[1], "~", paste(names(dat)[-c(1,2)], collapse = " + "))
     s_design <- survey::svydesign(ids = ~1, weights = ~weight, data = dat)
     mod <- survey::svyglm(f, design = s_design, family = quasibinomial())
+    betas <- mod$coefficients
 
-    res <- lapply(estimation_domains, FUN = by_domain_logistic)
+    res <- lapply(estimation_domains,
+                  FUN = by_domain_logistic,
+                  xsample,
+                  xpop_d,
+                  domain_col_name,
+                  xpop_sums,
+                  mod,
+                  y,
+                  var_est,
+                  var_method,
+                  weight,
+                  pi,
+                  pi2)
 
   }
 
@@ -187,8 +219,9 @@ modifiedGreg.numeric <- function(y,
     colSums()
 
   out <- list(
-    condition_res = res,
-    pop_res = pop_res
+    condition_level_res = res,
+    pop_res = pop_res,
+    coefs = betas
   )
 
   class(out) <- "modifiedGreg"

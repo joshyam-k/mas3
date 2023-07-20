@@ -2,7 +2,7 @@
 validate_modifiedGreg <- function(y,
                                   xsample,
                                   xpop,
-                                  condition,
+                                  domains,
                                   pi,
                                   pi2,
                                   datatype,
@@ -21,8 +21,8 @@ validate_modifiedGreg <- function(y,
     cli_abort(c("x" = "xsample and xpop must be objects of class `data.frame()`"))
   }
 
-  if (length(condition) != nrow(xsample)) {
-    cli_abort(c("x" = "condition input must be the same length as xsample."))
+  if (length(domains) != nrow(xsample)) {
+    cli_abort(c("x" = "domains input must be the same length as xsample."))
   }
 
   if(!is.logical(var_est)) {
@@ -114,7 +114,20 @@ varMase <- function(y, pi, pi2 = NULL, method = "LinHB", N = NULL){ #, fpc = fpc
 }
 
 
-by_domain_linear <- function(domain_id) {
+by_domain_linear <- function(domain_id,
+                             xsample,
+                             xpop_d,
+                             domain_col_name,
+                             comp1,
+                             comp2,
+                             betas,
+                             common_pred_vars,
+                             y,
+                             var_est,
+                             var_method,
+                             weight,
+                             pi,
+                             pi2) {
 
   domain_indic_vec <- as.integer(xsample[domain_col_name] == domain_id)
 
@@ -128,9 +141,9 @@ by_domain_linear <- function(domain_id) {
   w <- as.matrix(
     weight*domain_indic_vec + (
       t(as.matrix(xpop_d_domain) - xsample_dt_domain %*% weights_domain) %*%
-        constant_component1
+        comp1
     ) %*%
-      constant_component2
+      comp2
   )
 
   t <- w %*% y
@@ -172,13 +185,24 @@ by_domain_linear <- function(domain_id) {
 
 }
 
-by_domain_logistic <- function(domain_id) {
+by_domain_logistic <- function(domain_id,
+                               xsample,
+                               xpop_d,
+                               domain_col_name,
+                               xpop_sums,
+                               mod,
+                               y,
+                               var_est,
+                               var_method,
+                               weight,
+                               pi,
+                               pi2) {
 
   domain_indic_vec <- as.integer(xsample[domain_col_name] == domain_id)
 
-  xpop_domain <- xpop[xpop[domain_col_name] == domain_id, , drop = FALSE]
+  xpop_domain <- xpop_d[xpop_d[domain_col_name] == domain_id, , drop = FALSE]
   xsample_domain <- xsample[xsample[domain_col_name] == domain_id, , drop = FALSE]
-  domain_N <- xpop_sums[xpop_sums[domain_col_name] == domain_id, ,drop = FALSE][names(xpop)[1]]
+  domain_N <- xpop_sums[xpop_sums[domain_col_name] == domain_id, ,drop = FALSE][names(xpop_d)[1]]
 
   y_hats_U <- as.matrix(predict(mod, newdata = xpop_domain[ , -1], type = "response", family = quasibinomial()))
   y_hats_s <- as.matrix(predict(mod, newdata = xsample_domain, type = "response", family = quasibinomial()))
