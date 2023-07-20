@@ -1,11 +1,12 @@
 #' @export
 modifiedGreg <- function(x, ...)  UseMethod("modifiedGreg")
 
-
-modifiedGreg.default <- function(y,
+#' @export
+#' @rawNamespace export(modifiedGreg.numeric)
+modifiedGreg.numeric <- function(y,
                                  xsample,
                                  xpop,
-                                 conditions,
+                                 condition,
                                  pi = NULL,
                                  pi2 = NULL,
                                  datatype = "raw",
@@ -19,7 +20,18 @@ modifiedGreg.default <- function(y,
                                  N = NULL,
                                  messages = T) {
 
+  .args <- as.list(environment())
+  do.call(validate_modifiedGreg, .args)
   funcCall <- match.call()
-  # add validators
 
 }
+
+
+# modifiedGreg.data.frame <- function(y, ...) {
+#
+#   modifiedGreg.numeric(y[[1]], ...)
+#
+# }
+
+
+
