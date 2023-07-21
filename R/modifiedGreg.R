@@ -2,6 +2,7 @@
 #' @import survey
 #' @import glmnet
 #' @import boot
+#' @import utils
 #' @importFrom stats model.matrix predict quasibinomial var aggregate as.formula
 modifiedGreg <- function(y, ...)  UseMethod("modifiedGreg")
 
@@ -20,7 +21,7 @@ modifiedGreg.numeric <- function(y,
                                  modelselect = FALSE,
                                  lambda = "lambda.min",
                                  domain_col_name = NULL,
-                                 estimation_conditions = NULL,
+                                 estimation_domains = NULL,
                                  N = NULL,
                                  messages = T,
                                  ...) {
@@ -221,12 +222,76 @@ modifiedGreg.numeric <- function(y,
   out <- list(
     condition_level_res = res,
     pop_res = pop_res,
-    coefs = betas
+    coefs = betas,
+    call = funcCall,
+    modeltype = model,
+    var_est = var_est,
+    var_method = var_method
   )
 
   class(out) <- "modifiedGreg"
   out
 
+}
+
+#' @export
+print.modifiedGreg <- function(obj, ...) {
+
+  cat("\nCall:\n",
+      truncateText(deparse(x$call, width.cutoff = 500)),
+      "\n\n", sep = "")
+
+  cat(paste0("Model Type: ", obj$modeltype))
+  cat("\n")
+
+  if (obj$var_est) {
+    cat(paste0("Variance Method: ", obj$var_method))
+    cat("\n")
+  }
+
+
+
+}
+
+#' @export
+summary.modifiedGreg <- function(obj, ...) {
+
+  x <- obj$condition_level_res
+  by_domain_tab <- do.call(
+    rbind, lapply(
+      x, FUN = function(t) data.frame(
+        domain = t$domain,
+        domain_total = t$domain_total,
+        domain_totalvar = t$domain_total_var
+      )
+    )
+  )
+
+  pop_tab <- obj$pop_res
+  call <- obj$call
+
+  out <- list(call = call,
+              pop_tab = pop_tab,
+              by_domain_table = by_domain_tab)
+
+  class(out) <- "summary.modifiedGreg"
+  out
+
+}
+
+#' @export
+print.summary.modifiedGreg <- function(x, ...) {
+
+  cat("\nCall:\n",
+      truncateText(deparse(x$call, width.cutoff = 500)),
+      "\n\n",
+      sep = "")
+
+  print(head(x$by_domain_tab))
+  cat("\n")
+  print(x$pop_tab)
+  cat("\n")
+  invisible(x)
 }
 
 

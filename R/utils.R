@@ -12,7 +12,7 @@ validate_modifiedGreg <- function(y,
                                   modelselect,
                                   lambda,
                                   domain_col_name,
-                                  estimation_conditions,
+                                  estimation_domains,
                                   N,
                                   messages) {
 
@@ -243,4 +243,34 @@ by_domain_logistic <- function(domain_id,
 
   }
 
+}
+
+
+truncateText <- function(x) {
+  if (length(x) > 1)
+    x <- paste(x, collapse = "")
+  w <- options("width")$width
+  if (nchar(x) <= w)
+    return(x)
+
+  cont <- TRUE
+  out <- x
+  while (cont) {
+    tmp <- out[length(out)]
+    tmp2 <- substring(tmp, 1, w)
+
+    spaceIndex <- gregexpr("[[:space:]]", tmp2)[[1]]
+    stopIndex <- spaceIndex[length(spaceIndex) - 1] - 1
+    tmp <- c(substring(tmp2, 1, stopIndex),
+             substring(tmp, stopIndex + 1))
+    out <-
+      if (length(out) == 1)
+        tmp
+    else
+      c(out[1:(length(x) - 1)], tmp)
+    if (all(nchar(out) <= w))
+      cont <- FALSE
+  }
+
+  paste(out, collapse = "\n")
 }
