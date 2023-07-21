@@ -293,6 +293,7 @@ print.summary.modifiedGreg <- function(x, ...) {
   print(x$pop_tab)
   cat("\n")
   invisible(x)
+  
 }
 
 
