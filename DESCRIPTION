@@ -1,5 +1,5 @@
 Package: mas3
-Title: A prototype of a version of mcconvil/mase that uses using s3 generics
+Title: A prototype of mcconvil/mase that uses using S3 generics
 Version: 0.0.0.9000
 Authors@R: 
     person("Josh", "Yamamoto", , "joshuayamamoto5@gmail.com", role = c("aut", "cre"))
