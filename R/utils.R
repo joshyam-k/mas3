@@ -170,7 +170,8 @@ by_domain_linear <- function(domain_id,
       domain_total = as.numeric(t),
       domain_mean = as.numeric(t)/as.numeric(domain_N),
       domain_total_var = as.numeric(varEst),
-      domain_mean_var = as.numeric(varEst)/as.numeric(domain_N^2)
+      domain_mean_var = as.numeric(varEst)/as.numeric(domain_N^2),
+      weights = w
     ))
 
   } else {
@@ -178,7 +179,8 @@ by_domain_linear <- function(domain_id,
     return(list(
       domain = domain_id,
       domain_total = as.numeric(t),
-      domain_mean = as.numeric(t)/as.numeric(domain_N)
+      domain_mean = as.numeric(t)/as.numeric(domain_N),
+      weights = w
     ))
 
   }

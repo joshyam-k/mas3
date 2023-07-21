@@ -220,13 +220,14 @@ modifiedGreg.numeric <- function(y,
     colSums()
 
   out <- list(
-    condition_level_res = res,
+    domain_level_res = res,
     pop_res = pop_res,
     coefs = betas,
     call = funcCall,
     modeltype = model,
     var_est = var_est,
-    var_method = var_method
+    var_method = var_method,
+
   )
 
   class(out) <- "modifiedGreg"
@@ -238,7 +239,7 @@ modifiedGreg.numeric <- function(y,
 print.modifiedGreg <- function(obj, ...) {
 
   cat("\nCall:\n",
-      truncateText(deparse(x$call, width.cutoff = 500)),
+      truncateText(deparse(obj$call, width.cutoff = 500)),
       "\n\n", sep = "")
 
   cat(paste0("Model Type: ", obj$modeltype))
@@ -256,7 +257,7 @@ print.modifiedGreg <- function(obj, ...) {
 #' @export
 summary.modifiedGreg <- function(obj, ...) {
 
-  x <- obj$condition_level_res
+  x <- obj$domain_level_res
   by_domain_tab <- do.call(
     rbind, lapply(
       x, FUN = function(t) data.frame(
