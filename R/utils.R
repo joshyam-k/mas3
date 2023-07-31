@@ -1,20 +1,20 @@
 #' @importFrom cli cli_abort
-validate_modifiedGreg <- function(y,
-                                  xsample,
-                                  xpop,
-                                  domains,
-                                  pi,
-                                  pi2,
-                                  datatype,
-                                  model,
-                                  var_est,
-                                  var_method,
-                                  modelselect,
-                                  lambda,
-                                  domain_col_name,
-                                  estimation_domains,
-                                  N,
-                                  messages) {
+validate_modGreg <- function(y,
+                             xsample,
+                             xpop,
+                             domains,
+                             pi,
+                             pi2,
+                             datatype,
+                             model,
+                             var_est,
+                             var_method,
+                             modelselect,
+                             lambda,
+                             domain_col_name,
+                             estimation_domains,
+                             N,
+                             messages) {
 
 
   if (!is.data.frame(xsample) || !is.data.frame(xpop)) {
@@ -171,7 +171,7 @@ by_domain_linear <- function(domain_id,
       domain_mean = as.numeric(t)/as.numeric(domain_N),
       domain_total_var = as.numeric(varEst),
       domain_mean_var = as.numeric(varEst)/as.numeric(domain_N^2),
-      weights = w
+      weights = as.numeric(w)
     ))
 
   } else {
@@ -180,7 +180,7 @@ by_domain_linear <- function(domain_id,
       domain = domain_id,
       domain_total = as.numeric(t),
       domain_mean = as.numeric(t)/as.numeric(domain_N),
-      weights = w
+      weights = as.numeric(w)
     ))
 
   }
@@ -232,7 +232,8 @@ by_domain_logistic <- function(domain_id,
       domain_total = as.numeric(t),
       domain_mean = as.numeric(t)/as.numeric(domain_N),
       domain_total_var = as.numeric(varEst),
-      domain_mean_var = as.numeric(varEst)/as.numeric(domain_N^2)
+      domain_mean_var = as.numeric(varEst)/as.numeric(domain_N^2),
+      weights = as.numeric(w)
     ))
 
   } else {
@@ -240,7 +241,8 @@ by_domain_logistic <- function(domain_id,
     return(list(
       domain = domain_id,
       domain_total = as.numeric(t),
-      domain_mean = as.numeric(t)/as.numeric(domain_N)
+      domain_mean = as.numeric(t)/as.numeric(domain_N),
+      weights = as.numeric(w)
     ))
 
   }

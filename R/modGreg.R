@@ -1,34 +1,30 @@
-#' @export modifiedGreg
+#' @export modGreg
 #' @import survey
 #' @import glmnet
 #' @import boot
 #' @import utils
 #' @importFrom stats model.matrix predict quasibinomial var aggregate as.formula
-modifiedGreg <- function(y, ...)  UseMethod("modifiedGreg")
-
-#' @export
-#' @rawNamespace export(modifiedGreg.numeric)
-modifiedGreg.numeric <- function(y,
-                                 xsample,
-                                 xpop,
-                                 domains,
-                                 pi = NULL,
-                                 pi2 = NULL,
-                                 datatype = "raw",
-                                 model = "linear",
-                                 var_est = F,
-                                 var_method = "LinHB",
-                                 modelselect = FALSE,
-                                 lambda = "lambda.min",
-                                 domain_col_name = NULL,
-                                 estimation_domains = NULL,
-                                 N = NULL,
-                                 messages = T,
-                                 ...) {
 
 
-  .args <- c(as.list(environment()), list(...))
-  do.call(validate_modifiedGreg, .args)
+modGreg <- function(y,
+                        xsample,
+                        xpop,
+                        domains,
+                        pi = NULL,
+                        pi2 = NULL,
+                        datatype = "raw",
+                        model = "linear",
+                        var_est = F,
+                        var_method = "LinHB",
+                        modelselect = FALSE,
+                        lambda = "lambda.min",
+                        domain_col_name = NULL,
+                        estimation_domains = NULL,
+                        N = NULL,
+                        messages = T) {
+
+  .args <- as.list(environment())
+  do.call(validate_modGreg, .args)
   funcCall <- match.call()
 
   if (is.null(N)) {
@@ -229,13 +225,13 @@ modifiedGreg.numeric <- function(y,
     var_method = var_method
   )
 
-  class(out) <- "modifiedGreg"
-  out
+  structure(out, class = "modGreg")
 
 }
 
+
 #' @export
-print.modifiedGreg <- function(obj, ...) {
+print.modGreg <- function(obj, ...) {
 
   cat("\nCall:\n",
       truncateText(deparse(obj$call, width.cutoff = 500)),
@@ -248,13 +244,11 @@ print.modifiedGreg <- function(obj, ...) {
     cat(paste0("Variance Method: ", obj$var_method))
     cat("\n")
   }
-
-
-
 }
 
+
 #' @export
-summary.modifiedGreg <- function(obj, ...) {
+summary.modGreg <- function(obj, ...) {
 
   x <- obj$domain_level_res
   by_domain_tab <- do.call(
@@ -274,13 +268,12 @@ summary.modifiedGreg <- function(obj, ...) {
               pop_tab = pop_tab,
               by_domain_table = by_domain_tab)
 
-  class(out) <- "summary.modifiedGreg"
-  out
+  structure(out, class = "summary.modifiedGreg")
 
 }
 
 #' @export
-print.summary.modifiedGreg <- function(x, ...) {
+print.summary.modGreg <- function(x, ...) {
 
   cat("\nCall:\n",
       truncateText(deparse(x$call, width.cutoff = 500)),
@@ -294,8 +287,3 @@ print.summary.modifiedGreg <- function(x, ...) {
   invisible(x)
 
 }
-
-
-
-
-
